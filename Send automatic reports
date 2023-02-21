@@ -1,0 +1,34 @@
+# Connect to Azure
+Connect-AzAccount
+
+# Get the software update configuration
+$updates = Get-AzAutomationSoftwareUpdateConfiguration -ResourceGroupName example-rg -AutomationAccountName example-account -ConfigurationName example-update-management
+
+# Convert the updates to JSON
+$json = $updates | ConvertTo-Json
+
+# Send the report via email
+$smtpServer = "smtp.office365.com"
+$smtpPort = "587"
+$username = ""
+$password = "your-password"
+
+$from = "Ethan-ADM@bestjazzy.co.uk"
+$to = "Ethan-Steeley@phoenixs.co.uk"
+$subject = "Update management report"
+$body = "Please find the update management report attached."
+$attachment = $json
+
+$mailParams = @{
+    SmtpServer = $smtpServer
+    Port = $smtpPort
+    UseSSL = $true
+    Credential = New-Object System.Management.Automation.PSCredential ($username, (ConvertTo-SecureString $password -AsPlainText -Force))
+    From = $from
+    To = $to
+    Subject = $subject
+    Body = $body
+    Attachments = $attachment
+}
+
+Send-MailMessage @mailParams
